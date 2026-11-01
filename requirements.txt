@@ -1,0 +1,23 @@
+# Python packages Streamlit Community Cloud installs for app.py.
+# Last tested locally with: streamlit 1.60.0, qiskit 2.5.0, pylatexenc 2.11,
+# scikit-learn 1.9.0, plotly 6.9.0, matplotlib 3.11.0, pandas 3.0.3, numpy 2.5.1.
+
+# 1.60+ is required: the app uses width="stretch" on buttons/charts/tables
+# and st.tabs(default=...).
+streamlit>=1.60,<2
+
+# Quantum Lab: circuits + statevector simulation.
+qiskit>=2.0,<3
+# Needed by qiskit's circuit.draw(output="mpl"); without it the
+# Proficient/Erudite Quantum Lab pages crash.
+pylatexenc>=2.10
+
+# AI components (progress forecast, support-risk model, retrieval tutor).
+scikit-learn>=1.4,<2
+
+# Charts.
+plotly>=5.20,<7
+matplotlib>=3.8,<4
+
+pandas>=2.1,<4
+numpy>=1.26,<3
