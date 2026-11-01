@@ -22,6 +22,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from ui.landing_sections import render_about_section, render_footer, render_get_started_section
 from ui.navigation import render_course_nav, start_pathway
 from ui.theme import apply_theme
 
@@ -820,6 +821,8 @@ if page == "Welcome":
             if st.button(f"Start {level}", key=button_keys[level], width="stretch"):
                 go_to(level)
 
+    render_about_section(LEVELS, CURRICULUM)
+
     st.markdown("<div style='height:2.4rem'></div>", unsafe_allow_html=True)
     st.markdown("### How QubitPath works")
     how = [
@@ -837,6 +840,9 @@ if page == "Welcome":
     r1, r2 = st.columns(2)
     r1.link_button("IBM Quantum Learning catalog", IBM_COURSES_URL, width="stretch")
     r2.link_button("Qiskit documentation", QISKIT_DOCS_URL, width="stretch")
+
+    render_get_started_section(LEVELS, LEVEL_META, CURRICULUM)
+    render_footer()
 
 elif page == "Home":
     header("Learn quantum computing with an adaptive guide", "Structured pathways, hands-on labs, live tutoring, and transparent AI recommendations.")

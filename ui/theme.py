@@ -115,6 +115,52 @@ body .qp-card:empty { display: none; }
 
 /* Landing hero: Streamlit's paragraph margins cancel BASE_CSS's auto-centering of the subtitle. */
 body .qp-hero-sub { margin-left: auto; margin-right: auto; }
+
+/* ---- landing sections (ui/landing_sections.py) ---- */
+.qp-section-lead { color: var(--qp-text-soft); font-size: 1.05rem; line-height: 1.6; }
+.qp-stats { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .4rem; }
+.qp-stat { background: var(--qp-surface); border: 1px solid var(--qp-border); border-radius: 14px; padding: .5rem .9rem; }
+.qp-stat b { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; color: var(--qp-cyan); margin-right: .4rem; }
+.qp-stat span { color: var(--qp-text-soft); }
+
+.qp-bloch { display: flex; flex-direction: column; align-items: center; }
+.qp-bloch svg { width: 100%; max-width: 250px; height: auto; }
+.qp-bloch-shell { fill: rgba(124, 111, 242, 0.08); stroke: rgba(201, 200, 240, 0.55); stroke-width: 1.4; }
+.qp-bloch-back { fill: none; stroke: rgba(201, 200, 240, 0.3); stroke-width: 1.2; stroke-dasharray: 4 5; }
+.qp-bloch-front { fill: none; stroke: var(--qp-cyan); stroke-width: 1.6; stroke-dasharray: 6 6; animation: qp-bloch-flow 5s linear infinite; }
+.qp-bloch-axis { stroke: rgba(201, 200, 240, 0.45); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.qp-bloch-drop { stroke: rgba(255, 138, 101, 0.55); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.qp-bloch-state { stroke: var(--qp-coral); stroke-width: 3; stroke-linecap: round; }
+.qp-bloch-tip { fill: var(--qp-coral); }
+.qp-bloch-halo { fill: var(--qp-coral); transform-box: fill-box; transform-origin: center; animation: qp-bloch-pulse 2.8s ease-in-out infinite; }
+.qp-bloch-pole { fill: var(--qp-text-soft); }
+.qp-bloch-label { fill: var(--qp-text-soft); font-family: 'IBM Plex Mono', monospace; font-size: 15px; text-anchor: middle; }
+.qp-bloch .qp-bloch-caption { color: var(--qp-text-muted); font-size: .85rem; text-align: center; max-width: 300px; margin: .4rem auto 0; }
+@keyframes qp-bloch-flow { to { stroke-dashoffset: -120; } }
+@keyframes qp-bloch-pulse { 0%, 100% { opacity: .12; transform: scale(.75); } 50% { opacity: .4; transform: scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { .qp-bloch-front, .qp-bloch-halo { animation: none; } }
+
+.qp-step { background: var(--qp-surface); border: 1px solid var(--qp-border); border-radius: 18px; padding: 1.1rem 1.1rem 1rem; min-height: 170px; }
+.qp-step .qp-step-num {
+  display: inline-flex; width: 30px; height: 30px; border-radius: 50%; align-items: center; justify-content: center;
+  background: var(--qp-primary); color: var(--qp-bg); font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-right: .5rem;
+}
+.qp-step .qp-step-icon { font-size: 1.3rem; vertical-align: middle; }
+.qp-step h4 { margin: .6rem 0 .3rem; color: var(--qp-text); }
+.qp-step p { color: var(--qp-text-soft); font-size: .93rem; line-height: 1.5; margin: 0; }
+
+.qp-inside { min-height: 330px; }
+.qp-inside .qp-inside-meta { color: var(--qp-cyan); font-family: 'IBM Plex Mono', monospace; font-size: .78rem; }
+.qp-inside ul { margin: .5rem 0 0; padding-left: 1.1rem; }
+.qp-inside li { color: var(--qp-text-soft); font-size: .88rem; line-height: 1.45; }
+.qp-inside .qp-inside-more { list-style: none; margin-left: -1.1rem; color: var(--qp-text-muted); }
+
+.qp-footer { margin-top: 3rem; padding: 1.4rem 0 .6rem; border-top: 1px solid var(--qp-border); text-align: center; }
+.qp-footer p { color: var(--qp-text-soft); margin: .25rem 0; font-size: .92rem; }
+.qp-footer b { color: var(--qp-text); }
+.qp-footer .qp-footer-brand { font-family: 'Space Grotesk', sans-serif; color: var(--qp-cyan); font-weight: 600; font-size: 1.05rem; }
+.qp-footer .qp-footer-note { color: var(--qp-text-muted); font-size: .85rem; }
+.qp-footer a { color: var(--qp-link); }
 """
 
 
