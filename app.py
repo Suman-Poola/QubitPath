@@ -22,6 +22,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from ui.navigation import render_course_nav, start_pathway
+
 
 # ============================================================================
 # Constants
@@ -115,7 +117,7 @@ st.set_page_config(
     page_title=f"{APP_TITLE} | Quantum Learning",
     page_icon="\u269B\uFE0F",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="auto",
 )
 
 # ============================================================================
@@ -773,9 +775,17 @@ recommended = find_recommended_lesson(learner_level)
 
 
 def go_to(level: str) -> None:
-    st.session_state["learner_level_select"] = level
-    st.session_state["page"] = "Home"
+    start_pathway(level)
     st.rerun()
+
+
+if page != "Welcome":
+    render_course_nav(
+        PAGE_KEYS,
+        page,
+        lambda k: f"{NAV_ICONS[k]}  {nav_label(learner_level, k)}",
+        f"{LEVEL_META[learner_level]['icon']} {learner_level} pathway \u00b7 {LEVEL_META[learner_level]['age_range']}",
+    )
 
 
 # ============================================================================
@@ -882,7 +892,7 @@ elif page == "Home":
 
 elif page == "Recorded Learning":
     header("Recorded learning library", "Choose a pathway, open a lesson, complete its activity, and track your progress.")
-    tabs = st.tabs(LEVELS)
+    tabs = st.tabs(LEVELS, default=learner_level)
     for tab, level in zip(tabs, LEVELS):
         with tab:
             st.markdown(f"### {level} pathway")
