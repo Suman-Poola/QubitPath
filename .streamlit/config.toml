@@ -1,0 +1,14 @@
+# Theme for every QubitPath page, taken from the landing page's dark blue.
+# Keep these colors in sync with PALETTE in ui/theme.py.
+
+[theme]
+base = "dark"
+primaryColor = "#8B7FF5"             # brand violet, lightened for 4.5:1+ contrast on dark surfaces
+backgroundColor = "#0E1330"          # landing hero ink
+secondaryBackgroundColor = "#1A2050" # inputs, code blocks, table headers
+textColor = "#F4F3FF"
+linkColor = "#1FBFB2"                # cyan wordmark
+showWidgetBorder = true              # inputs stay visible on the dark background
+font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap, sans-serif"
+headingFont = "Space Grotesk:https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap, sans-serif"
+codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&display=swap, monospace"

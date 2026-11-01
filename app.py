@@ -23,6 +23,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from ui.navigation import render_course_nav, start_pathway
+from ui.theme import apply_theme
 
 
 # ============================================================================
@@ -767,6 +768,8 @@ else:
     learner_goal = LEVEL_META["Elementary"]["goal_options"][0]
     page = "Welcome"
 
+apply_theme(LEVEL_META[learner_level]["accent"] if page != "Welcome" else None)
+
 features_row = learner_features(learner_level, weekly_hours, math_comfort)
 predicted_progress = float(progress_model.predict(features_row)[0])
 risk_probability = float(risk_model.predict_proba(features_row)[0, 1])
@@ -1228,7 +1231,7 @@ elif page == "Analytics":
         }
         radar = go.Figure()
         radar.add_trace(go.Scatterpolar(r=list(skill_scores.values()), theta=list(skill_scores.keys()), fill="toself", name="Skill score"))
-        radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, title="Skill coverage profile (all pathways)")
+        radar.update_layout(polar=dict(bgcolor="rgba(0,0,0,0)", radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, title="Skill coverage profile (all pathways)")
         st.plotly_chart(radar, width="stretch")
     with c4:
         if st.session_state.quiz_history:
