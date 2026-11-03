@@ -12,7 +12,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import streamlit.components.v1 as components
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
 from sklearn.ensemble import RandomForestRegressor
@@ -22,9 +21,11 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from ui.activities import activity_done, render_activity
 from ui.landing_sections import render_about_section, render_footer, render_get_started_section
 from ui.navigation import render_course_nav, start_pathway
 from ui.theme import apply_theme
+from ui.walkthroughs import render_walkthrough, walkthrough_done
 
 
 # ============================================================================
@@ -35,7 +36,7 @@ APP_TITLE = "QubitPath"
 LEVELS = ["Elementary", "Proficient", "Erudite"]
 LEVEL_TO_NUM = {"Elementary": 1, "Proficient": 2, "Erudite": 3}
 IBM_COURSES_URL = "https://quantum.cloud.ibm.com/learning/en/courses"
-QISKIT_DOCS_URL = "https://qiskit.qotlabs.org/docs/"
+QISKIT_DOCS_URL = "https://quantum.cloud.ibm.com/docs/en/guides"
 
 PAGE_KEYS = [
     "Home",
@@ -49,7 +50,7 @@ PAGE_KEYS = [
 ]
 NAV_ICONS = {
     "Home": "\U0001F3E0",
-    "Recorded Learning": "\U0001F3AC",
+    "Recorded Learning": "\U0001F4D8",
     "Live Tutoring": "\U0001F9D1\u200D\U0001F3EB",
     "Quantum Lab": "\U0001F9EA",
     "Quiz & Games": "\U0001F3AE",
@@ -111,8 +112,12 @@ LEVEL_META: dict[str, dict[str, Any]] = {
 }
 
 
+# Display names that differ from the internal page keys (the keys stay the same so routing is unchanged).
+NAV_LABELS = {"Recorded Learning": "Guided Lessons"}
+
+
 def nav_label(level: str, page_key: str) -> str:
-    return LEVEL_META[level]["nav_overrides"].get(page_key, page_key)
+    return LEVEL_META[level]["nav_overrides"].get(page_key, NAV_LABELS.get(page_key, page_key))
 
 
 st.set_page_config(
@@ -264,7 +269,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "EL1", "title": "What Makes a Computer Think?", "duration": 15, "difficulty": 1,
             "objectives": ["Explain that computers store everything as 0s and 1s", "Give two real-world on/off examples", "Say why a light switch is a good bit"],
             "summary": "Every regular computer, from a phone to a laptop, breaks information into tiny switches called bits. A bit is only ever one of two things: off (0) or on (1) \u2014 just like a light switch.",
-            "activity": "Walk around your room and find three things that work like a bit: only ever one of two states.",
+            "activity": "Bit hunt: sort everyday things into bits and not-bits, then find three bits in your own room.",
             "recording": "Recorded lesson: Meet the humble bit",
             "resource": IBM_COURSES_URL,
         },
@@ -272,7 +277,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "EL2", "title": "The Magic Spinning Coin", "duration": 18, "difficulty": 1,
             "objectives": ["Describe a qubit using the spinning-coin idea", "Explain what \u201cmeasuring\u201d means", "Predict roughly how many heads vs. tails in many flips"],
             "summary": "A qubit is like a magic coin: while it's spinning in the air it isn't heads or tails yet, it's a mix of both. The moment you catch it and look \u2014 that's a measurement \u2014 it becomes just one answer.",
-            "activity": "Flip a real coin 10 times and tally heads vs. tails, then compare with the Magic Coin Machine.",
+            "activity": "Coin race: flip a real (or pretend) coin, then spin the magic coin the same number of times and compare.",
             "recording": "Recorded lesson: Why quantum coins are weird",
             "resource": IBM_COURSES_URL,
         },
@@ -280,7 +285,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "EL3", "title": "Flip It! Quantum Switches", "duration": 20, "difficulty": 1,
             "objectives": ["Use the Flip switch to turn 0 into 1", "Use the Maybe switch to make a spinning coin", "Read a two-switch recipe in order"],
             "summary": "Scientists build quantum programs out of tiny switches called gates. The one we call the Flip switch (real name: X) always swaps 0 and 1. The Maybe switch (real name: H) turns a plain 0 into a spinning magic coin.",
-            "activity": "In the mini-game, match each switch to the trick it performs.",
+            "activity": "Matching game: match each switch recipe to its trick, then prove it on the quantum simulator.",
             "recording": "Recorded lesson: Two switches, endless tricks",
             "resource": IBM_COURSES_URL,
         },
@@ -288,7 +293,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "EL4", "title": "Partner Coins: A Quantum Magic Trick", "duration": 18, "difficulty": 1,
             "objectives": ["Describe entanglement as \u201clinked partner coins\u201d", "Say why this surprised even Einstein", "Recognize the word entanglement"],
             "summary": "Sometimes scientists link two magic coins so tightly that whatever one lands on, the other always matches \u2014 even from opposite sides of a room, or opposite sides of the planet. Real scientists call this entanglement, and it's one of the strangest true facts we know about nature.",
-            "activity": "Play the partner-coin game with a friend: agree on a rule, then \u201cmeasure\u201d your coins at the same time and check the match.",
+            "activity": "Partner-coin game: peek at your coin, guess your friend\u2019s, and discover why partner coins always match.",
             "recording": "Recorded lesson: Coins that always agree",
             "resource": IBM_COURSES_URL,
         },
@@ -298,7 +303,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "MS1", "title": "Bits vs. Qubits", "duration": 25, "difficulty": 1,
             "objectives": ["Compare a classical bit with a qubit", "Read the labels |0\u27e9 and |1\u27e9", "List one real device that already uses qubits"],
             "summary": "A classical bit is always 0 or 1. A qubit can be a mix of both \u2014 scientists write the two options as |0\u27e9 and |1\u27e9, and a qubit's state can combine them until it's measured.",
-            "activity": "Sort five devices (phone, quantum computer prototype, calculator, thermostat, qubit sensor) into classical vs. quantum.",
+            "activity": "Sort statements about bits and qubits: is each one true of a bit, a qubit, or both?",
             "recording": "Recorded lesson: From bits to qubits",
             "resource": IBM_COURSES_URL,
         },
@@ -306,7 +311,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "MS2", "title": "Superposition and Percent Chances", "duration": 28, "difficulty": 1,
             "objectives": ["Explain superposition in one sentence", "Turn a count of outcomes into a percentage", "Interpret a bar chart of measurement results"],
             "summary": "Superposition means a qubit is in a combination of |0\u27e9 and |1\u27e9 at once. You can't see the mix directly \u2014 you only see percentages after measuring many times, similar to how flipping one coin many times reveals it's \u201cabout 50/50.\u201d",
-            "activity": "Run the Circuit Playground's coin experiment for 100 shots and calculate the percentage that landed on 1.",
+            "activity": "Percent challenge: run two circuits and turn the counts of 1s into percentages.",
             "recording": "Recorded lesson: Reading a results bar chart",
             "resource": QISKIT_DOCS_URL,
         },
@@ -314,7 +319,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "MS3", "title": "Your First Circuit", "duration": 30, "difficulty": 2,
             "objectives": ["Read a circuit diagram left to right", "Name the X and H gates", "Predict a simple one-gate outcome"],
             "summary": "A quantum circuit is a recipe: a line for each qubit, with boxes (gates) placed left to right showing what happens to it over time. The X gate flips |0\u27e9 and |1\u27e9; the H gate creates an equal mix of both.",
-            "activity": "Build a one-gate circuit in the Circuit Playground and check whether the result matches your prediction.",
+            "activity": "Circuit builder: put gates on a wire, predict the result, and solve three challenges.",
             "recording": "Recorded lesson: Reading circuit diagrams",
             "resource": QISKIT_DOCS_URL,
         },
@@ -322,7 +327,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "MS4", "title": "Spooky Pairs: Intro to Entanglement", "duration": 30, "difficulty": 2,
             "objectives": ["Define entanglement in your own words", "Explain why Einstein called it \u201cspooky\u201d", "Identify a Bell-pair result pattern (00 or 11 only)"],
             "summary": "A special two-qubit gate can link two qubits so tightly that measuring one instantly tells you the other's result \u2014 even though neither one had a fixed value before you looked. Albert Einstein famously called this \u201cspooky action at a distance,\u201d and it's now used in real quantum technology.",
-            "activity": "Run the Bell-entanglement experiment in the Circuit Playground and confirm you only ever see 00 or 11.",
+            "activity": "Build the Bell pair yourself, run it, and confirm you only ever see 00 or 11.",
             "recording": "Recorded lesson: Meeting entanglement for real",
             "resource": IBM_COURSES_URL,
         },
@@ -332,7 +337,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HF1", "track": "Foundations", "title": "Bits, Qubits, and the Quantum Mindset", "duration": 35, "difficulty": 1,
             "objectives": ["Compare a classical bit with a qubit", "Read ket notation", "Identify realistic quantum-computing use cases"],
             "summary": "A bit is either 0 or 1. A qubit is described by a normalized complex state vector and can be measured to produce a classical result.",
-            "activity": "Classify five everyday problems as classical, quantum-inspired, or potentially quantum-relevant.",
+            "activity": "Decide which vectors are valid qubit states, then sort tasks into classical work and quantum research targets.",
             "recording": "Recorded lesson: From bits to qubits",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/single-systems/introduction",
         },
@@ -340,31 +345,31 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HF2", "track": "Foundations", "title": "Superposition and Measurement", "duration": 45, "difficulty": 1,
             "objectives": ["Explain amplitudes and probabilities", "Apply normalization", "Interpret repeated measurement counts"],
             "summary": "Superposition is a linear combination of basis states. Measurement converts amplitudes into outcome probabilities through the Born rule.",
-            "activity": "Use the Quantum Coin mini-game to compare predicted and sampled outcomes.",
+            "activity": "Born-rule drill: predict Pr(1) for given states, then sample them and compare.",
             "recording": "Recorded lesson: Why quantum measurement is probabilistic",
-            "resource": "https://qiskit.qotlabs.org/learning/courses/basics-of-quantum-information/single-systems/quantum-information",
+            "resource": "https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/single-systems/quantum-information",
         },
         {
             "id": "HF3", "track": "Foundations", "title": "Quantum Gates and Circuit Diagrams", "duration": 50, "difficulty": 1,
             "objectives": ["Recognize X, H, Z, and rotation gates", "Read a circuit left to right", "Predict basic single-qubit outcomes"],
             "summary": "Quantum gates are reversible linear operations. The X gate flips basis states, while the H gate creates and removes equal superpositions.",
-            "activity": "Build a single-qubit circuit and compare your prediction with Qiskit simulation.",
+            "activity": "Gate puzzles: build single-qubit circuits that hit target states, checked against Qiskit.",
             "recording": "Recorded lesson: Gate-by-gate circuit reading",
-            "resource": "https://qiskit.qotlabs.org/docs/guides/circuit-library",
+            "resource": "https://quantum.cloud.ibm.com/docs/en/guides/circuit-library",
         },
         {
             "id": "HF4", "track": "Foundations", "title": "Your First Qiskit Program", "duration": 55, "difficulty": 1,
             "objectives": ["Create a QuantumCircuit", "Simulate a statevector", "Sample measurement counts"],
             "summary": "Qiskit represents quantum programs as circuits. A local statevector simulator is ideal for learning before using real quantum hardware.",
-            "activity": "Create a Bell state and explain why 01 and 10 should not appear in the ideal simulator.",
+            "activity": "Assemble the Bell program line by line, run it, and explain why 01 and 10 never appear.",
             "recording": "Recorded lab: Build and run a Bell circuit",
-            "resource": "https://qiskit.qotlabs.org/docs/guides/quick-start",
+            "resource": "https://quantum.cloud.ibm.com/docs/en/guides/quick-start",
         },
         {
             "id": "HA1", "track": "Entanglement & Algorithms", "title": "Multiple Qubits and Tensor Products", "duration": 60, "difficulty": 2,
             "objectives": ["Determine multi-qubit state dimensions", "Interpret basis ordering", "Construct product states"],
             "summary": "The state space grows as 2^n for n qubits. Tensor products combine individual systems into a joint mathematical description.",
-            "activity": "Calculate the eight basis states for a three-qubit register.",
+            "activity": "List the eight basis states of a three-qubit register, then predict which basis states a product state contains.",
             "recording": "Recorded lesson: Scaling from one qubit to many",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/multiple-systems/introduction",
         },
@@ -372,15 +377,15 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HA2", "track": "Entanglement & Algorithms", "title": "Entanglement and Bell States", "duration": 65, "difficulty": 2,
             "objectives": ["Distinguish correlation from entanglement", "Prepare a Bell state", "Interpret joint measurements"],
             "summary": "Entangled states cannot be written as a product of independent subsystem states. Bell states are the standard two-qubit examples.",
-            "activity": "Run the Bell-state lab for several shot counts and compare statistical variation.",
+            "activity": "Run each Bell state at 10, 100 and 1000 shots and compare the statistical variation.",
             "recording": "Recorded lesson: Entanglement without faster-than-light messaging",
-            "resource": "https://qiskit.qotlabs.org/learning/courses/basics-of-quantum-information/entanglement-in-action/introduction",
+            "resource": "https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/entanglement-in-action/introduction",
         },
         {
             "id": "HA3", "track": "Entanglement & Algorithms", "title": "Teleportation and Superdense Coding", "duration": 75, "difficulty": 2,
             "objectives": ["Describe the role of shared entanglement", "Track classical communication", "Separate state transfer from matter transfer"],
             "summary": "Quantum teleportation transfers an unknown quantum state using shared entanglement plus two classical bits; it does not transmit matter or violate causality.",
-            "activity": "Draw the information flow and label quantum versus classical channels.",
+            "activity": "Label the quantum and classical channels in teleportation, put the protocol in order, then check superdense coding.",
             "recording": "Recorded lesson: Quantum communication protocols",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/entanglement-in-action/quantum-teleportation",
         },
@@ -388,7 +393,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HA4", "track": "Entanglement & Algorithms", "title": "Quantum Algorithms: Deutsch\u2013Jozsa and Grover", "duration": 85, "difficulty": 2,
             "objectives": ["Explain oracle-based algorithms", "Describe amplitude amplification", "Compare query complexity"],
             "summary": "Early quantum algorithms reveal how interference can suppress wrong answers and amplify useful ones. Grover search gives a quadratic query improvement for unstructured search.",
-            "activity": "Trace one Grover iteration for a two-qubit search space.",
+            "activity": "Trace one Grover iteration for a two-qubit search space, predicting the marked amplitude at each stage.",
             "recording": "Recorded lesson: Interference as an algorithmic resource",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/fundamentals-of-quantum-algorithms",
         },
@@ -396,7 +401,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HR1", "track": "Advanced Research", "title": "Density Matrices, Noise, and Channels", "duration": 90, "difficulty": 3,
             "objectives": ["Represent mixed states", "Calculate purity conceptually", "Describe common noise channels"],
             "summary": "Density matrices describe pure and mixed states. Quantum channels model physically allowed transformations, including noise and decoherence.",
-            "activity": "Compare ideal and noisy state descriptions and identify which information is lost.",
+            "activity": "Noise detective: predict what dephasing and depolarizing erase, then compare ideal and noisy density matrices.",
             "recording": "Recorded seminar: From statevectors to open systems",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/general-formulation-of-quantum-information",
         },
@@ -404,7 +409,7 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HR2", "track": "Advanced Research", "title": "Variational Algorithms and VQE", "duration": 100, "difficulty": 3,
             "objectives": ["Describe hybrid quantum-classical loops", "Identify ansatz and optimizer roles", "Interpret expectation-value objectives"],
             "summary": "Variational algorithms use a parameterized quantum circuit and a classical optimizer. VQE estimates low-energy states of a Hamiltonian.",
-            "activity": "Sketch a VQE workflow and identify possible sources of optimization failure.",
+            "activity": "Put the VQE loop in order, then run three setups and diagnose why two of them fail.",
             "recording": "Recorded lab: Anatomy of a VQE experiment",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/quantum-chem-with-vqe",
         },
@@ -412,15 +417,15 @@ CURRICULUM: dict[str, list[dict[str, Any]]] = {
             "id": "HR3", "track": "Advanced Research", "title": "QAOA and Combinatorial Optimization", "duration": 100, "difficulty": 3,
             "objectives": ["Map a cost function to a Hamiltonian", "Explain alternating operators", "Evaluate approximation quality"],
             "summary": "QAOA alternates problem and mixer operators. It is a framework for experimenting with approximate solutions to combinatorial problems.",
-            "activity": "Encode a small Max-Cut instance and discuss measurement-to-solution post-processing.",
+            "activity": "Encode your own Max-Cut graph as a Hamiltonian, run QAOA, and post-process the samples into a cut.",
             "recording": "Recorded workshop: Hybrid optimization with QAOA",
-            "resource": "https://qiskit.qotlabs.org/learning/courses/variational-algorithm-design",
+            "resource": "https://quantum.cloud.ibm.com/learning/en/courses/variational-algorithm-design",
         },
         {
             "id": "HR4", "track": "Advanced Research", "title": "Quantum Error Correction and Fault Tolerance", "duration": 110, "difficulty": 3,
             "objectives": ["Explain logical versus physical qubits", "Describe syndrome measurement", "Identify the purpose of fault tolerance"],
             "summary": "Quantum error correction protects logical information by encoding it across many physical qubits and extracting error syndromes without directly reading the logical state.",
-            "activity": "Work through a three-qubit repetition-code example and identify its limitations.",
+            "activity": "Inject one or two errors into the repetition code and classify what it can and can\u2019t correct.",
             "recording": "Recorded seminar: Protecting fragile quantum information",
             "resource": "https://quantum.cloud.ibm.com/learning/en/courses/foundations-of-quantum-error-correction",
         },
@@ -646,6 +651,13 @@ LEVEL_NOTE = {
 }
 
 
+NO_MATCH = {
+    "Elementary": "Hmm, I don't have any notes about that yet!",
+    "Proficient": "I couldn't find anything about that in my notes.",
+    "Erudite": "No concept in the built-in knowledge base matches that question.",
+}
+
+
 def professor_answer(question: str, learner_level: str, strategy: str) -> str:
     vectorizer, matrix = build_retriever()
     query_vec = vectorizer.transform([question])
@@ -653,6 +665,9 @@ def professor_answer(question: str, learner_level: str, strategy: str) -> str:
     top_idx = scores.argsort()[::-1][:3]
     top = [KNOWLEDGE_BASE[i] for i in top_idx]
     confidence = float(scores[top_idx[0]]) if len(top_idx) else 0.0
+    if confidence <= 0:  # no shared vocabulary at all (greetings, typos): don't answer with an arbitrary note
+        topics = ", ".join(item["title"] for item in KNOWLEDGE_BASE)
+        return f"{NO_MATCH[learner_level]} Try asking about one of these topics: {topics}."
     core = top[0]["text"]
     related = ", ".join(item["title"] for item in top[1:])
 
@@ -709,9 +724,11 @@ def make_circuit(experiment: str, theta: float) -> tuple[QuantumCircuit, str]:
     return qc, expectation
 
 
-def sample_statevector(qc: QuantumCircuit, shots: int, seed: int = 7) -> tuple[dict[str, int], Statevector]:
+def sample_statevector(qc: QuantumCircuit, shots: int, seed: int | None = None) -> tuple[dict[str, int], Statevector]:
+    """Sampled counts (fresh randomness each call unless ``seed`` is given) and the exact state."""
     state = Statevector.from_instruction(qc)
-    state.seed(seed)
+    if seed is not None:
+        state.seed(seed)
     counts = dict(state.sample_counts(shots=shots))
     return counts, state
 
@@ -732,7 +749,6 @@ def score_quiz(items: list[dict[str, Any]], selected: list[str]) -> tuple[int, l
 # ============================================================================
 
 init_state()
-progress_model, risk_model, feature_importance, dnn_training_accuracy = train_ai_models()
 
 current_page = st.session_state["page"]
 
@@ -740,11 +756,14 @@ if current_page != "Welcome":
     with st.sidebar:
         st.markdown(f'<p class="qp-sidebar-title">\u269B\uFE0F {APP_TITLE}</p>', unsafe_allow_html=True)
         st.caption("Adaptive quantum-computing education prototype")
-        learner_name = st.text_input("Learner display name", value="Quantum Explorer")
-        learner_level = st.selectbox("Current pathway", LEVELS, key="learner_level_select")
-        weekly_hours = st.slider("Planned study hours per week", 1.0, 12.0, 4.0, 0.5)
-        math_comfort = st.slider("Math comfort", 1, 5, 3, help="1 = developing; 5 = very comfortable")
-        learner_goal = st.selectbox("Primary goal", LEVEL_META[learner_level]["goal_options"])
+        # persist_state keeps these settings while the landing page (which has no sidebar) is showing.
+        learner_name = st.text_input("Learner display name", value="Quantum Explorer", key="learner_name", persist_state="session")
+        learner_level = st.selectbox("Current pathway", LEVELS, key="learner_level_select", persist_state="session")
+        weekly_hours = st.slider("Planned study hours per week", 1.0, 12.0, 4.0, 0.5, key="weekly_hours", persist_state="session")
+        math_comfort = st.slider("Math comfort", 1, 5, 3, help="1 = developing; 5 = very comfortable", key="math_comfort",
+                                 persist_state="session")
+        learner_goal = st.selectbox("Primary goal", LEVEL_META[learner_level]["goal_options"],
+                                    key=f"learner_goal_{learner_level}", persist_state="session")
         st.markdown("---")
         page = st.radio(
             "Navigate",
@@ -770,6 +789,9 @@ else:
     page = "Welcome"
 
 apply_theme(LEVEL_META[learner_level]["accent"] if page != "Welcome" else None)
+
+# Trained once per server (cached), after the theme so a cold start doesn't flash a white page while it runs.
+progress_model, risk_model, feature_importance, dnn_training_accuracy = train_ai_models()
 
 features_row = learner_features(learner_level, weekly_hours, math_comfort)
 predicted_progress = float(progress_model.predict(features_row)[0])
@@ -826,7 +848,7 @@ if page == "Welcome":
     st.markdown("<div style='height:2.4rem'></div>", unsafe_allow_html=True)
     st.markdown("### How QubitPath works")
     how = [
-        ("\U0001F3AC", "Recorded lessons", "Work through leveled lessons at your own pace, then mark them complete to earn XP."),
+        ("\U0001F4D8", "Guided lessons", "Step-by-step walkthroughs and a hands-on activity in every lesson, then mark it complete to earn XP."),
         ("\U0001F9D1\u200D\U0001F3EB", "Live tutoring", "Book time with a tutor over Zoom, Teams, or Google Meet when you get stuck."),
         ("\U0001F9EA", "A real quantum lab", "Build circuits and run them on an ideal Qiskit simulator \u2014 not just a picture of one."),
         ("\U0001F916", "An AI guide that adapts", "Ask Professor Qubit questions, then rate the answer \u2014 the platform learns which teaching style helps."),
@@ -883,7 +905,7 @@ elif page == "Home":
     st.markdown("### Explore the platform")
     cols = st.columns(4)
     cards = [
-        ("\U0001F3AC", "Recorded learning", "Study leveled modules, lesson notes, activities, and official references."),
+        ("\U0001F4D8", nav_label(learner_level, "Recorded Learning"), "Step-by-step walkthroughs, lesson notes, activities, and official references."),
         ("\U0001F9D1\u200D\U0001F3EB", "Live tutoring", "Book a prototype Zoom, Teams, or Google Meet session with a tutor."),
         (LEVEL_META[learner_level]["icon"], LEVEL_META[learner_level]["lab_name"], "Build and simulate quantum circuits with sampled measurements."),
         ("\U0001F4CA", nav_label(learner_level, "Analytics"), "Review progress, skill coverage, quiz history, and AI forecasts."),
@@ -900,7 +922,7 @@ elif page == "Home":
     st.warning("All predictions are demonstrations trained on synthetic data. A human tutor should review any learner-support decision.")
 
 elif page == "Recorded Learning":
-    header("Recorded learning library", "Choose a pathway, open a lesson, complete its activity, and track your progress.")
+    header("Guided lessons", "Choose a pathway, open a lesson, follow its step-by-step walkthrough, do its hands-on activity, and track your progress.")
     tabs = st.tabs(LEVELS, default=learner_level)
     for tab, level in zip(tabs, LEVELS):
         with tab:
@@ -910,7 +932,7 @@ elif page == "Recorded Learning":
                 track = st.radio("Track", ERUDITE_TRACKS, horizontal=True, key="erudite_track_select")
                 lessons = [l for l in lessons if l["track"] == track]
             selected_title = st.selectbox(
-                f"Select a {level.lower()} lesson",
+                "Choose a lesson",
                 [f"{x['id']} \u2014 {x['title']}" for x in lessons],
                 key=f"lesson_select_{level}",
             )
@@ -924,38 +946,40 @@ elif page == "Recorded Learning":
                     st.markdown(f"- {objective}")
                 st.markdown("**Lesson notes**")
                 st.write(lesson["summary"])
-                st.markdown("**Hands-on activity**")
-                st.write(lesson["activity"])
-                st.markdown("**Recording panel**")
-                st.info(f"\U0001F3AC {lesson['recording']} \u2014 prototype slot. Replace the external resource link with your own hosted recording when available.")
+                render_walkthrough(lesson)
+                render_activity(lesson)
                 st.link_button(LEVEL_META[level]["resource_label"], lesson["resource"], width="stretch")
             with b:
                 completed = lesson["id"] in st.session_state.completed_lessons
-                st.markdown('<div class="qp-card">', unsafe_allow_html=True)
-                st.markdown("#### Lesson checkpoint")
-                st.write("Explain the key concept in your own words, complete the activity, then mark the lesson complete.")
-                if completed:
-                    st.success("Completed \u2713")
-                elif st.button("Mark lesson complete", key=f"complete_{lesson['id']}", width="stretch"):
-                    st.session_state.completed_lessons.append(lesson["id"])
-                    st.session_state.xp += 40
-                    st.success("Lesson completed. +40 XP")
-                    st.rerun()
-                st.markdown("#### Keep exploring")
-                if level == "Elementary":
-                    st.markdown("- Ask a grown-up to try the lesson with you")
-                    st.markdown("- Try the mini-game in Quiz & Games")
-                    st.markdown("- Retell the idea to someone in one sentence")
-                elif level == "Proficient":
-                    st.markdown("- Try the matching Circuit Playground experiment")
-                    st.markdown("- Take the Proficient quiz for this topic")
-                    st.markdown(f"- {LEVEL_META[level]['resource_label']} above, when you're ready to go deeper")
-                else:
-                    st.markdown("- IBM Quantum Learning course catalog")
-                    st.markdown("- Qiskit documentation and tutorials")
-                    st.markdown("- *Quantum Computing for Everyone* \u2014 Chris Bernhardt")
-                    st.markdown("- *Introduction to Classical and Quantum Computing* \u2014 Thomas Wong")
-                st.markdown("</div>", unsafe_allow_html=True)
+                with st.container(border=True):
+                    st.markdown("#### Lesson checkpoint")
+                    checklist = [
+                        ("Finish the guided walkthrough", walkthrough_done(lesson["id"])),
+                        ("Complete the hands-on activity", activity_done(lesson["id"])),
+                    ]
+                    st.markdown("  \n".join(("\u2705 " if done else "\u2b1c ") + label for label, done in checklist))
+                    st.write("Then explain the key concept in your own words and mark the lesson complete.")
+                    if completed:
+                        st.success("Completed \u2713")
+                    elif st.button("Mark lesson complete", key=f"complete_{lesson['id']}", width="stretch"):
+                        st.session_state.completed_lessons.append(lesson["id"])
+                        st.session_state.xp += 40
+                        st.success("Lesson completed. +40 XP")
+                        st.rerun()
+                    st.markdown("#### Keep exploring")
+                    if level == "Elementary":
+                        st.markdown("- Ask a grown-up to try the lesson with you")
+                        st.markdown("- Try the mini-game in Quiz & Games")
+                        st.markdown("- Retell the idea to someone in one sentence")
+                    elif level == "Proficient":
+                        st.markdown("- Try the matching Circuit Playground experiment")
+                        st.markdown("- Take the Proficient quiz for this topic")
+                        st.markdown(f"- {LEVEL_META[level]['resource_label']} above, when you're ready to go deeper")
+                    else:
+                        st.markdown("- IBM Quantum Learning course catalog")
+                        st.markdown("- Qiskit documentation and tutorials")
+                        st.markdown("- *Quantum Computing for Everyone* \u2014 Chris Bernhardt")
+                        st.markdown("- *Introduction to Classical and Quantum Computing* \u2014 Thomas Wong")
 
 elif page == "Live Tutoring":
     header("Live tutoring studio", "Schedule guided practice with a tutor through Zoom, Microsoft Teams, or Google Meet.")
@@ -1043,7 +1067,9 @@ elif page == "Quantum Lab":
         left, right = st.columns([1, 1.25])
         with left:
             experiment = st.selectbox("Experiment", experiment_options)
-            theta = st.slider("Rotation angle \u03b8", 0.0, float(2 * np.pi), float(np.pi / 2), 0.05, disabled=experiment != "Custom Ry rotation")
+            theta = 0.0
+            if experiment == "Custom Ry rotation":
+                theta = st.slider("Rotation angle \u03b8", 0.0, float(2 * np.pi), float(np.pi / 2), 0.05)
             shots = st.select_slider("Measurement shots", options=[100, 256, 512, 1024, 2048, 4096], value=1024)
             prediction_options = ["Mostly 0", "Mostly 1", "Balanced outcomes", "Only correlated all-zero/all-one outcomes"]
             prediction = st.selectbox("Predict the dominant ideal outcome pattern", prediction_options)
@@ -1115,9 +1141,11 @@ elif page == "Quiz & Games":
     with st.form(f"quiz_{quiz_key}"):
         selected_answers = []
         for idx, item in enumerate(quiz_items, start=1):
-            selected_answers.append(st.radio(f"{idx}. {item['q']}", item["options"], key=f"{quiz_key}_{idx}"))
+            selected_answers.append(st.radio(f"{idx}. {item['q']}", item["options"], index=None, key=f"{quiz_key}_{idx}"))
         quiz_submit = st.form_submit_button("Submit quiz", width="stretch")
-    if quiz_submit:
+    if quiz_submit and None in selected_answers:
+        st.warning(f"Answer all {len(quiz_items)} questions before submitting ({selected_answers.count(None)} left).")
+    elif quiz_submit:
         correct, details = score_quiz(quiz_items, selected_answers)
         score_pct = 100 * correct / len(quiz_items)
         st.session_state.quiz_history.append({"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "level": quiz_level, "score_pct": score_pct})
@@ -1242,7 +1270,11 @@ elif page == "Analytics":
     with c4:
         if st.session_state.quiz_history:
             quiz_df = pd.DataFrame(st.session_state.quiz_history)
-            quiz_fig = px.bar(quiz_df, x="date", y="score_pct", color="level", title="Quiz history", range_y=[0, 100])
+            # One bar per attempt: grouping by the minute-resolution date would stack same-minute attempts past 100%.
+            quiz_df.insert(0, "attempt", range(1, len(quiz_df) + 1))
+            quiz_fig = px.bar(quiz_df, x="attempt", y="score_pct", color="level", hover_data=["date"], title="Quiz history",
+                              range_y=[0, 100], labels={"attempt": "Attempt", "score_pct": "Score (%)"})
+            quiz_fig.update_xaxes(type="category")
             st.plotly_chart(quiz_fig, width="stretch")
         else:
             st.info("Complete a quiz to populate the quiz-history chart.")

@@ -41,7 +41,7 @@ BLOCH_CAPTION = (  # EDIT ME
 # (icon, title, text). "{levels}" is replaced with the level names, e.g. "Elementary, Proficient, or Erudite".
 STEPS = [  # EDIT ME
     ("\U0001F9ED", "Choose your level", "Pick {levels}. You can switch pathways any time from the sidebar."),
-    ("\U0001F3AC", "Learn", "Open a lesson for its goals, notes and a hands-on activity, then mark it complete to earn XP."),
+    ("\U0001F3AC", "Learn", "Follow a lesson's step-by-step walkthrough, do its hands-on activity, then mark it complete to earn XP."),
     ("\U0001F916", "Practice & ask the AI", "Run experiments in the lab, take quick quizzes, and ask Professor Qubit when you get stuck."),
 ]
 

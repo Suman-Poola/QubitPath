@@ -14,7 +14,7 @@ Send the message below with the alpha flyer. Replace every `[EDIT ME: …]` firs
 >
 > 1. Open the app: [EDIT ME: app link]
 > 2. Pick a level and click its **Start** or **Begin** button.
-> 3. Open a lesson, try the lab (the "Magic Coin Machine" / "Circuit Playground" / "Quantum Lab"), and ask Professor Qubit one question.
+> 3. Open a lesson, follow its step-by-step walkthrough, and do the hands-on activity below it. Then try the lab (the "Magic Coin Machine" / "Circuit Playground" / "Quantum Lab"), and ask Professor Qubit one question.
 > 4. Use **← Back to landing** to return to the home page.
 >
 > Then answer the questions below by replying to this message [EDIT ME: or use this form link]. Thank you so much!
@@ -33,7 +33,7 @@ Send the message below with the alpha flyer. Replace every `[EDIT ME: …]` firs
 
 4. **Readability.** Was the text easy to read on the dark blue background, including small gray text, buttons, and charts? Point out anything that was hard to read.
 
-5. **Empty or confusing spots.** Which part felt empty, unfinished, or confusing? Was there anything you expected to find but couldn't?
+5. **Lessons and confusing spots.** Did the step-by-step lesson walkthrough help you understand the idea? Which step or part of the site felt confusing, too long, or unfinished? Was there anything you expected to find but couldn't?
 
 6. **Right level.** Which level did you try, and did the content feel right for that age and experience? (too easy / about right / too hard)
 

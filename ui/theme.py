@@ -109,10 +109,6 @@ body button[kind="primary"]:is(:hover, :focus-visible, :active) {
   color: var(--qp-on-accent);
 }
 
-/* app.py's "Lesson checkpoint" opens a qp-card div in one st.markdown call and closes it in
-   another; Streamlit can't wrap widgets that way, so it leaves an empty card. Hide it. */
-body .qp-card:empty { display: none; }
-
 /* Landing hero: Streamlit's paragraph margins cancel BASE_CSS's auto-centering of the subtitle. */
 body .qp-hero-sub { margin-left: auto; margin-right: auto; }
 

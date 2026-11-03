@@ -14,6 +14,9 @@ pylatexenc>=2.10
 
 # AI components (progress forecast, support-risk model, retrieval tutor).
 scikit-learn>=1.4,<2
+# COBYLA optimizer for the VQE and QAOA lesson experiments (imported directly,
+# so don't rely on scikit-learn pulling it in). 1.11+ for COBYLA bounds.
+scipy>=1.11,<2
 
 # Charts.
 plotly>=5.20,<7
