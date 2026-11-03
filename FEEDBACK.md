@@ -1,25 +1,17 @@
-# Qubit Path AI: alpha feedback kit
-
-Send the message below with the alpha flyer. Replace every `[EDIT ME: …]` first.
-
----
-
-## Message to send with the flyer
-
-> Hi [EDIT ME: name]!
+> Hi Tester!
 >
 > I've been building **Qubit Path AI**, a website that teaches quantum computing to students from about 3rd grade through high school. You pick a level (Elementary, Proficient, or Erudite) and it gives you short lessons, a mini quantum lab, quizzes, and an AI tutor called Professor Qubit.
 >
 > It's an early alpha, and I'd really appreciate **5–10 minutes** of your honest feedback, especially on the look and the layout. Nothing is too small to mention!
 >
-> 1. Open the app: [EDIT ME: app link]
+> 1. Open the app.  
 > 2. Pick a level and click its **Start** or **Begin** button.
 > 3. Open a lesson, follow its step-by-step walkthrough, and do the hands-on activity below it. Then try the lab (the "Magic Coin Machine" / "Circuit Playground" / "Quantum Lab"), and ask Professor Qubit one question.
 > 4. Use **← Back to landing** to return to the home page.
 >
-> Then answer the questions below by replying to this message [EDIT ME: or use this form link]. Thank you so much!
+> Then answer the questions below by replying to this message. Thank you so much!
 >
-> [EDIT ME: your name]
+Suman Poola
 
 ---
 
