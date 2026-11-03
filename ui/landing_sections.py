@@ -21,38 +21,38 @@ from ui.navigation import start_pathway
 # Copy shown on the landing page
 # ---------------------------------------------------------------------------
 
-PRODUCT_NAME = "Qubit Path AI"  # EDIT ME (the hero wordmark in app.py says "QubitPath")
-GITHUB_URL = "https://github.com/Suman-Poola/QubitPath"  # EDIT ME if the repo moves
-AUTHOR_CREDIT = "Suman"  # EDIT ME (e.g. full name)
-MENTOR_CREDIT = "Qingyang"  # EDIT ME (e.g. full name / title)
+PRODUCT_NAME = "Qubit Path AI"  
+GITHUB_URL = "https://github.com/Suman-Poola/QubitPath"  
+AUTHOR_CREDIT = "Suman Poola"  
+MENTOR_CREDIT = "Qingyang Xiao"  
 
-ABOUT_TEXT = (  # EDIT ME
+ABOUT_TEXT = (  
     f"{PRODUCT_NAME} takes students from “what is a bit?” all the way to quantum error "
     "correction. Pick the pathway that fits your age and experience, work through short lessons "
     "with hands-on activities, run real circuits on a Qiskit simulator, and ask Professor Qubit, "
     "the built-in AI tutor, whenever something doesn’t click."
 )
 
-BLOCH_CAPTION = (  # EDIT ME
+BLOCH_CAPTION = (  
     "This is a Bloch sphere: how physicists picture one qubit. The top is |0⟩, the bottom "
     "is |1⟩, and anywhere in between is a superposition."
 )
 
 # (icon, title, text). "{levels}" is replaced with the level names, e.g. "Elementary, Proficient, or Erudite".
-STEPS = [  # EDIT ME
+STEPS = [  
     ("\U0001F9ED", "Choose your level", "Pick {levels}. You can switch pathways any time from the sidebar."),
     ("\U0001F3AC", "Learn", "Follow a lesson's step-by-step walkthrough, do its hands-on activity, then mark it complete to earn XP."),
     ("\U0001F916", "Practice & ask the AI", "Run experiments in the lab, take quick quizzes, and ask Professor Qubit when you get stuck."),
 ]
 
 # One or two sentences per level. A level missing here falls back to its LEVEL_META blurb.
-PATHWAY_COVERS = {  # EDIT ME
+PATHWAY_COVERS = {  
     "Elementary": "Bits, magic spinning coins, flip-and-maybe switches, and partner coins: big quantum ideas told through stories and games, no math needed.",
     "Proficient": "Bits vs. qubits, superposition as percent chances, your first circuit diagram, and entanglement, with the real vocabulary.",
     "Erudite": "Three tracks, from your first Qiskit program through entanglement and algorithms to VQE, QAOA, and error correction.",
 }
 
-FOOTER_NOTE = "Alpha preview · An educational prototype. Feedback is very welcome!"  # EDIT ME
+FOOTER_NOTE = "Alpha preview · An educational prototype. Feedback is very welcome!"  
 
 
 # ---------------------------------------------------------------------------
